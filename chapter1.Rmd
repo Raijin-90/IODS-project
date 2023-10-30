@@ -15,7 +15,6 @@ For general networking, feel free to contact on [Linkedin](https://www.linkedin.
 And of course [here's](https://raijin-90.github.io/IODS-project/) the course repo :)
 
 
-
 ## What I'm looking for by attending
 
 In my projects at SYKE we're utilizing R in various capacities, on a daily basis. 
