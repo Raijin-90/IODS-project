@@ -4,9 +4,6 @@ author: "Henri V"
 output: html_document
 date: "2023-10-30"
 ---
-
-
-
 # Learning expectations for the course 
 
 ## My background
@@ -33,11 +30,4 @@ Additionally, the statistical component will most likely benefit me as well. I w
 Initial impressions suggest this would've been a good learning material when I first started dealing with R. The basics are made simple to understand. but the scope seems to go quite a bit deeper than that. There seems to be plenty to learn and I'm tempted to treat this as a reference material in future too (or a tutorial for colleagues, if I'm allowed to share it outside the course?)
 
 
-```{r}
-# This is a so-called "R chunk" where you can write R code.
-
-date()
-
-```
-The text continues here.
 
