@@ -4,20 +4,20 @@ author: "Henri V"
 output: html_document
 date: "2023-10-30"
 ---
-# Learning expectations for the course 
+## Learning expectations for the course 
 
-## My background
+### My background
 
 MSC. biology, currently working at SYKE, ca. 5 years experience. 
 Main interests: sustainability at macro scale, national EE-IO analysis, food system sustainability modeling, circular economy.. 
 
-##LINKS
+### Links
 
 * For general networking, feel free to contact on [Linkedin](https://www.linkedin.com/in/henrivirkkunen/)
 * And of course [here's](https://raijin-90.github.io/IODS-project/) the course repo :)
 
 
-## What I'm looking for by attending
+### What I'm looking for by attending
 
 In my projects at SYKE we're utilizing R in various capacities, on a daily basis. 
 I'm expecting to expand my skill level concerning R, and maybe find new tools/packages to use in my work. Maybe this'll be easier when there's some structure to the learning.  
@@ -26,7 +26,7 @@ Our team just implemented Git as well, so it's nice to get a bit deeper into it 
 
 Additionally, the statistical component will most likely benefit me as well. I wish to expand my repertuare of analytical capabilities overall. At this point, I'm not looking to learn any single particular analysis type (since it's hard to tell what will be useful in the coming years), so it's good to have a solid reference base 
 
-## Impressions on Excercise 1 and the R for Health Data Science book
+### Impressions on Excercise 1 and the R for Health Data Science book
 
 Initial impressions suggest this would've been a good learning material when I first started dealing with R. The basics are made simple to understand. but the scope seems to go quite a bit deeper than that. There seems to be plenty to learn and I'm tempted to treat this as a reference material in future too (or a tutorial for colleagues, if I'm allowed to share it outside the course?)
 
