@@ -1,3 +1,11 @@
+---
+title: "Chapter 1"
+author: "Henri V"
+output: html_document
+date: "2023-10-30"
+---
+
+
 
 # Learning expectations for the course 
 
