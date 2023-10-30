@@ -1,7 +1,20 @@
 
-# About the project
+# Learning expectations for the course 
 
-*Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you should use R Markdown syntax.*
+*My background*
+
+MSC. biology, currently working at SYKE, ca. 5 years experience. 
+Main interests: sustainability at macro scale, national EE-IO analysis, food system sustainability modeling, circular economy.. 
+
+*What I'm looking for by attending* 
+
+In my projects at SYKE we're utilizing R in various capacities, on a daily basis. 
+I'm expecting to expand my skill level concerning R, and maybe find new tools/packages to use in my work. Maybe this'll be easier when there's some structure to the learning.  
+
+Our team just implemented Git as well, so it's nice to get a bit deeper into it as well.    
+
+Additionally, the statistical component will most likely benefit me as well. I wish to expand my repertuare of analytical capabilities overall. At this point, I'm not looking to learn any single particular analysis type (since it's hard to tell what will be useful in the coming years), so it's good to have a solid reference base 
+
 
 ```{r}
 # This is a so-called "R chunk" where you can write R code.
