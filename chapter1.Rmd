@@ -6,6 +6,10 @@
 MSC. biology, currently working at SYKE, ca. 5 years experience. 
 Main interests: sustainability at macro scale, national EE-IO analysis, food system sustainability modeling, circular economy.. 
 
+For general networking, feel free to contact on [Linkedin](https://www.linkedin.com/in/henrivirkkunen/)
+
+
+
 ## What I'm looking for by attending
 
 In my projects at SYKE we're utilizing R in various capacities, on a daily basis. 
@@ -17,7 +21,7 @@ Additionally, the statistical component will most likely benefit me as well. I w
 
 ## Impressions on Excercise 1 and the R for Health Data Science book
 
-Initial impressions suggest this would've been a good learning material when I first started dealing with R. The basics are made simple to understand. but the scope seems to go quite a bit deeper than that.
+Initial impressions suggest this would've been a good learning material when I first started dealing with R. The basics are made simple to understand. but the scope seems to go quite a bit deeper than that. There seems to be plenty to learn and I'm tempted to treat this as a reference material in future too (or a tutorial for colleagues, if I'm allowed to share it outside the course?)
 
 
 ```{r}
