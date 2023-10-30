@@ -11,8 +11,10 @@ date: "2023-10-30"
 MSC. biology, currently working at SYKE, ca. 5 years experience. 
 Main interests: sustainability at macro scale, national EE-IO analysis, food system sustainability modeling, circular economy.. 
 
-For general networking, feel free to contact on [Linkedin](https://www.linkedin.com/in/henrivirkkunen/)
-And of course [here's](https://raijin-90.github.io/IODS-project/) the course repo :)
+##LINKS
+
+* For general networking, feel free to contact on [Linkedin](https://www.linkedin.com/in/henrivirkkunen/)
+* And of course [here's](https://raijin-90.github.io/IODS-project/) the course repo :)
 
 
 ## What I'm looking for by attending
