@@ -1,4 +1,4 @@
-# Insert chapter 2 title here
+# 2: Regression and model validation  
 
 *Describe the work you have done this week and summarize your learning.*
 
@@ -6,8 +6,43 @@
 - Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.
 - Assume the reader has no previous knowledge of your data or the more advanced methods you are using.
 
-```{r}
-date()
+## Step 1: Data wrangling
+
+
+### 1.1: Install required packages
+
+* To make data retrievals more fluent, we can use the Here package to make setting file paths easy. 
+* "Here" eliminates the need of setting precise file pathways for data retrieval or saving, as it automatically looks for the designated file in its "starting point path", by default the current working directory.
+* This can be modified, as shown later. 
+
+```{r, echo = T, results =F, message= F, warning= F}
+if (!require(here) == T) {
+  install.packages("here") #Checks if the package "here" is NOT installed. If this evaluates to TRUE, runs installation.  
+}
+library(here)
+
+
+if (!require(tidyverse) == T) {
+  install.packages("tidyverse") #Checks if the package "here" is NOT installed. If this evaluates to TRUE, runs installation.  
+}
+library(tidyverse)
+
 ```
 
-Here we go again...
+
+### 1.2 Run the script "create_learning2014.R"
+
+
+* The required data set, learning 2014, is downloaded and edited in a separate script. 
+* The script is sourced. This generates the data for analysis by running the said script. Read the data after. 
+* Package "here" automatically looks for the file in the path specified in here(), which defaults to the current project work directory. 
+
+
+```{r,echo = T, results =T, message= F, warning= F}
+source(here("create_learning2014.R"))
+
+Data<-read.csv(here("Data/learning2014.csv")) #Here we change the default "here"-path by adding that the source should commence in its Data subfolder. We look for a file named "learning2014.csv". 
+```
+
+* Data is read, and we can begin step 2.
+
