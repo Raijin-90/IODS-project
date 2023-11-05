@@ -107,3 +107,6 @@ str(read_csv(here("Data/learning2014.csv")))
 head(read_csv(here("Data/learning2014.csv")))
 
 #Same structure.
+
+gc()
+rm(list=ls())
