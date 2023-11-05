@@ -12,21 +12,25 @@
 ### 1.1: Install required packages
 
 * To make data retrievals more fluent, we can use the Here package to make setting file paths easy. 
-* "Here" eliminates the need of setting precise file pathways for data retrieval or saving, as it automatically looks for the designated file in its "starting point path", by default the current working directory.
-* This can be modified, as shown later. 
+* "Here" eliminates the need of setting precise file pathways for data retrieval or saving, as it automatically looks for the designated file in its "starting point path", by default the current working directory, viewable by command here().
 
 ```{r, echo = T, results =F, message= F, warning= F}
+
 if (!require(here) == T) {
-  install.packages("here") #Checks if the package "here" is NOT installed. If this evaluates to TRUE, runs installation.  
+  install.packages("here") #Checks if the package is NOT installed. If this evaluates to TRUE, runs installation.  
 }
 library(here)
 
 
 if (!require(tidyverse) == T) {
-  install.packages("tidyverse") #Checks if the package "here" is NOT installed. If this evaluates to TRUE, runs installation.  
+  install.packages("tidyverse")
 }
 library(tidyverse)
 
+if (!require(GGally) == T) {
+  install.packages("GGally")   
+}
+library(GGally)
 ```
 
 
@@ -34,15 +38,116 @@ library(tidyverse)
 
 
 * The required data set, learning 2014, is downloaded and edited in a separate script. 
-* The script is sourced. This generates the data for analysis by running the said script. Read the data after. 
 * Package "here" automatically looks for the file in the path specified in here(), which defaults to the current project work directory. 
 
 
-```{r,echo = T, results =T, message= F, warning= F}
+```{r,echo = F, results =F, message= F, warning= F}
 source(here("create_learning2014.R"))
 
 Data<-read.csv(here("Data/learning2014.csv")) #Here we change the default "here"-path by adding that the source should commence in its Data subfolder. We look for a file named "learning2014.csv". 
 ```
 
-* Data is read, and we can begin step 2.
+## Step 2: Analysis phase
 
+### 2.1 Graphical summary of the variables
+
+* First off, we produce a faceted plot of all variables.
+
+```{r,echo = T, results =T, message= T, warning= T}
+
+ggpairs(Data, mapping = aes(), lower = list(combo = wrap("facethist", bins = 20)))
+```
+
+#### Commentary
+
+* Considerably skewed gender distribution.
+  * Excact values 110 female, 56 male.  
+* No immediately obvious patterns or clustering can be seen in the scatter plots. 
+  * Except maybe for column 2. In these plots, majority of data points cluster to the left (towards low values). 
+* Multiple statistically significant  correlations are evident in the data.
+* Variables "Age" and "surf" appear to correlate negatively. We see a slight statistical significance for it as well ( . = significance threshold 0.1)  
+* Distribution of "Age" is strongly skewed towards low values (see lineplot at intersection Age x Age) 
+  * Mostly people on the younger side are represented in the data.  
+* Attitude and Points correlate positively and show a high significance level.
+  * Strongest positive correlation coefficient that the data has. 
+* Variables "surf" and "deep" likewise correlate strongly, but in a different direction (negative coefficient)
+  * Their correlation is the strongest negative one seen in the data., 
+
+### 2.2 Simple linear regression
+
+* For this task, we create a model that attempts to explain variation in points by the values of deep learning, attitude and age. 
+
+  
+```{r}
+x<-lm(Points ~ deep+Attitude+Age, data = Data) #Create model, assign a name "x" to it
+summary(x)
+```
+#### Commentary
+
+* Just one variable, attitude, had a statistically significant relationship with Points.
+* Next, we refine the model by removing the 2 nonsignificant variables
+* Can these two be purged from the model, without suffering a loss in explanatory power?
+
+
+### Model version 2 (removal of the non-significant explanatory variables)
+  
+```{r}
+z<-lm(Points ~ Attitude, data = Data) #Create model, assign a name "x" to it
+summary(z)
+```
+* Fit remains at about the same ballpark, ca. 20 %, despite the removal of the two other variables.
+  * This single variable explains the variation in the data just as well, despite being simpler than the first. 
+  
+* P value indicates the likelihood of obtaining a similar result as seen, assuming that the null hypotesis is true (in our case, h0 would be something like: "No relationship exists between attitude and points")
+  * Low P lends support to the idea that we can reject h0.
+  * Here, P is lower than 0.001 -> strong support for rejecting h0. 
+  
+* "Estimate" shows regression coefficients, that indicate how severe the relation is (simply put, bigger value = steeper slope). 
+  * When the value of attitude increases by 1 unit, response variable increases by 0.35
+
+* Model fit parameters (R2) indicate a rather poor fit (circa 20%). R2 indicates, how well or badly the fitted model suits the data. Poor fit may result, if we attempt to describe a non-linear relationship using a linear model... 
+  * Attitude explains circa 1/5 of the variation in Points.
+
+### Residuals
+
+* Next, we plot model residuals to assess whether or not the model fulfills prerequisite assumptions of linear regression.
+* Failing to meet these leads to unstable models, biased regression coefficients and in turn unreliable predictive power. 
+
+```{r}
+
+
+plot(z, which=c(1,2,5))
+
+```
+
+* The assumptions we diagnose are:
+  * *Equality of variances*. 
+    * The method assumes that variance in the data remains equal, despite parameters taking on different values.
+    * In stats jargon, data that has equal variances is called "homoscedastic", while heteroscedastic data is the opposite. 
+    * To diagnose this, we can look at the "Residual v Fitted, or "Scale-location" plots (not shown). 
+    * Here, if the assumption is met and variances are equal, the data points should be spread more or less evenly along the line. 
+    * On the other hand, if we saw e.g. a funnel-like shape (points that cluster closer together on one end of X axis than on the other end), we could say that the variances were not equal. 
+    * <span style="color: red;"> Here, most of the data points are spread relatively even...except for the points on the extreme right of the plot. 
+      * Points from X axis tick 26 onward are grouped more tightly together. 
+      * Variances may not be entirely equal... 
+      * However, I am tempted to still say that they are "good enough", as only a tiny bit of the data mass seems to misbehave. </span>  
+    * *Linearity assumption*. 
+      * If we want to use linear regression, the relationship we examine should be linear in form. If it is not, a method change would be warranted.  
+      * This can be examined via "Residuals vs Fitted" plot.   
+      * In a well-behaved plot, we look for data points spread randomly around the 0-line, in a "shotgun blast" kind of arrangement, with no observable patterns or funnel shapes (see 1st assumption, this plot can be used for it as well). Such a distribution indicates that the relationship is indeed linear.  
+      * <span style="color: red;">Here, all seems to be in order as the points are randomly spread around the zero line.</span> 
+    * *Normality of residuals*
+      * Residuals should be normally distributed. 
+      * Diagnosed via the Q-Q residuals plot. 
+      * In an ideal case, the data points should follow the line on the plot without deviating. 
+      * <span style="color: red;">Here, data seems mostly fine, as only the tails diverge slightly from the line. Not perfect, but good enough?. 100% normality is a bit too much to expect from real-world data?  </span> 
+
+* Next, we can check if there are any highly influential observations in the data mass. 
+  * Residuals v. leverage plot highlights cases that have a high influence on model parameters. If we were to remove them, model parameters (coeffs, R2...) would change considerably.  
+  *  <span style="color: red;">Plot shows that observation on row 71 has a high impact.  </span> 
+  * Removing it would have a high impact on model coefficients. 
+  * In a real world application, I would take a closer look at these, and see if their values make sense or are there mistakes in the data. Contextual knowledge is needed for this. 
+  * In each such case, a judgement call would have to be made on whether the value should stay or leave.  
+      
+
+    
