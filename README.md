@@ -1,2 +1,3 @@
 # IODS-project
-Template for the IODS course
+
+Course diary: https://raijin-90.github.io/IODS-project/
