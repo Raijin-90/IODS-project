@@ -5,14 +5,39 @@ date: "2023-11-12"
 output: html_document
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, results = F)
-
-library(tidyverse); library(here)
-
 ```
 
-# Assignment 3: Logistic Regression   
+# Assignment 3: Logistic Regression
+
+
+## Install required packages
+
+* Note that running this procedure requires:
+  * Tidyverse
+  * gt
+  * here
+
+```{r,include=F}
+
+if (!require(here) == T) {
+  install.packages("here") #Checks if the package is NOT installed. If this evaluates to TRUE, runs installation.  
+}
+library(here)
+
+
+if (!require(tidyverse) == T) {
+  install.packages("tidyverse")
+}
+library(tidyverse)
+
+if (!require(gt) == T) {
+  install.packages("gt")   
+}
+library(gt)
+```
 
 ## Reading source data into R
 
@@ -23,4 +48,92 @@ library(tidyverse); library(here)
 ```{r,  echo=T}
 source(here("Scripts/create_data_assignment3.R"))
 ```
+
+## Forming initial hypotheses
+
+* In this excercise, we try to find out if there is a connection between alcohol consumption and other variables
+* The meanings of each variable are explained under "Additional variable information" [here](https://archive.ics.uci.edu/dataset/320/student+performance) 
+* The following 4 are chosen and initial hypotheses for the proposed relationship formed:
+  * _absences_: could high rates of alcohol consumption be affiliated with high rates of absences from school?   
+  * _health_: hypothesis is that people consuming higher doses of alcohol may have a worse health condition than those who abstain?   
+  * _failures_: increased likelihood of course failures among heavy drinkers? 
+  * _famrel_: increased likelihood of heavy drinking leading to family conflicts (poorer family relations?) 
+  
+  
+## Summary table for variables  
+
+```{r, echo=F, include=F}  
+taulukko<-alc %>% group_by(high_use) %>% summarise(`Average absence` = mean(absences),
+                                            `St.Dev, absences.`=sd(absences),
+                                            `Average health` = mean(health),
+                                            `St.Dev., health`=sd(health),
+                                            `Average failure` = mean(failures),
+                                            `St.Dev., failures`=sd(failures),
+                                            `Average family relations` = mean(famrel),
+                                            `St.Dev., family relations` = sd(famrel))
+```
+
+```{r, results=T, echo=F}
+gt(taulukko) %>%
+  fmt_number(decimals=2) %>% cols_align("center") %>% opt_stylize(style=1, color="green")  %>% tab_header("")
+
+```
+
+### Absence
+
+* The total sum of absences appears to be higher in the low alcohol consumption group, which is contrary to initial expectations...
+* However, on average, absence rates seem to be higher in the high alcohol consumption group than in the low consumption group (6.4 versus 3.7). More variation in the high-consuming group.  
+  * Consistent with initial assumptions.
+
+```{r, echo=F, include=F}
+
+ggplot(alc, aes(x = high_use, y = absences)) + geom_boxplot() + ggtitle("Distribution of `absences` values by group")
+```
+
+### Health
+
+* Regarding health, differences between groups seem small.
+  * Contrary to expectation, alc consumption does not seem to differ between groups?
+
+```{r, echo=F, include= T}
+ggplot(alc, aes(x = high_use, y = health)) + geom_boxplot()+ggtitle("Distribution of `health` values by group")
+```
+
+### Failure rate
+* Failure rate is on average slightly higher in the high consumption group, as was assumed, but the difference is less pronounced than I was expecting.
+* 0 failures seem to be the most common situation regardless of group, any other values are marginally represented in comparison. 
+
+
+```{r, results=T, echo=F, message=F}
+Frek<-(alc %>% group_by(high_use, failures) %>% summarise(n = n())) 
+
+gt(Frek) %>%  
+  cols_align("center") %>% 
+  opt_stylize(style=1, color="green") %>% 
+  tab_header("Frequency of `failure` values by group")
+
+```
+
+
+```{r, echo=F}
+
+ggplot(alc, aes(x = high_use, y = failures)) + geom_boxplot() + ggtitle("Distribution of `health` values by group")
+
+```
+
+
+
+
+```{r, echo =F}
+
+ggplot(alc, aes(x = high_use, y = famrel)) + geom_boxplot()
+
+```
+
+* Family relation values appear to be on average slightly poorer in the high alcohol consumption group.
+* This is the sort of finding I expected to see, but the magnitude of difference between the groups is lower than I thought it would be. . 
+
+
+
+
 

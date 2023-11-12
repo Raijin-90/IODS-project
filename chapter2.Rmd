@@ -42,7 +42,7 @@ library(GGally)
 
 
 ```{r,echo = F, results =F, message= F, warning= F}
-source(here("create_learning2014.R"))
+source(here("Scripts/create_learning2014.R"))
 
 Data<-read.csv(here("Data/learning2014.csv")) #Here we change the default "here"-path by adding that the source should commence in its Data subfolder. We look for a file named "learning2014.csv". 
 ```
