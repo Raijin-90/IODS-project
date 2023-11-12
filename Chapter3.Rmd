@@ -1,0 +1,26 @@
+---
+title: 'Assignment 3: Logistic Regression'
+author: "Henri V"
+date: "2023-11-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = F)
+
+library(tidyverse); library(here)
+
+```
+
+# Assignment 3: Logistic Regression   
+
+## Reading source data into R
+
+* First off, we read the required source data into R. 
+  * A separate script was created for this.
+  * Data frame "alc" contains the necessary data
+  
+```{r,  echo=T}
+source(here("Scripts/create_data_assignment3.R"))
+```
+

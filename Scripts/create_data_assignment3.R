@@ -51,7 +51,7 @@ for(col_name in free_cols) {
     alc[col_name] <- round(rowMeans(two_cols))
   } else { # else (if the first column vector was not numeric)...
     # add the first column vector to the alc data frame
-    alc[col_name] <- "change me!"
+    alc[col_name] <- first_col
   }
 }
 
@@ -69,5 +69,5 @@ glimpse(alc)
 
 write_csv(mat_por ,here("Data/Data_assignment3.csv"))
 
-
+rm(mat_por, two_cols)
 
