@@ -60,9 +60,9 @@ source(here("Scripts/create_data_assignment3.R"))
   * _famrel_: increased likelihood of heavy drinking leading to family conflicts (poorer family relations?) 
   
   
-## Summary table for variables  
+## Summary table for variables, graphical examinatons  
 
-```{r, echo=F, include=F}  
+```{r, echo}  
 taulukko<-alc %>% group_by(high_use) %>% summarise(`Average absence` = mean(absences),
                                             `St.Dev, absences.`=sd(absences),
                                             `Average health` = mean(health),
@@ -73,19 +73,18 @@ taulukko<-alc %>% group_by(high_use) %>% summarise(`Average absence` = mean(abse
                                             `St.Dev., family relations` = sd(famrel))
 ```
 
-```{r, results=T, echo=F}
+```{r, results=T}
 gt(taulukko) %>%
-  fmt_number(decimals=2) %>% cols_align("center") %>% opt_stylize(style=1, color="green")  %>% tab_header("")
+  fmt_number(decimals=2) %>% cols_align("center") %>% opt_stylize(style=1, color="green")  %>% tab_header("Summary table")
 
 ```
 
 ### Absence
 
-* The total sum of absences appears to be higher in the low alcohol consumption group, which is contrary to initial expectations...
-* However, on average, absence rates seem to be higher in the high alcohol consumption group than in the low consumption group (6.4 versus 3.7). More variation in the high-consuming group.  
+* on average, absence rates seem to be higher in the high alcohol consumption group than in the low consumption group (6.4 versus 3.7). More variation in the high-consuming group.  
   * Consistent with initial assumptions.
 
-```{r, echo=F, include=F}
+```{r}
 
 ggplot(alc, aes(x = high_use, y = absences)) + geom_boxplot() + ggtitle("Distribution of `absences` values by group")
 ```
@@ -94,8 +93,12 @@ ggplot(alc, aes(x = high_use, y = absences)) + geom_boxplot() + ggtitle("Distrib
 
 * Regarding health, differences between groups seem small.
   * Contrary to expectation, alc consumption does not seem to differ between groups?
+* Mean 3.5 versus 3.7, almost the same. SD at 1.4 in both...
 
-```{r, echo=F, include= T}
+
+
+
+```{r}
 ggplot(alc, aes(x = high_use, y = health)) + geom_boxplot()+ggtitle("Distribution of `health` values by group")
 ```
 
@@ -115,13 +118,8 @@ gt(Frek) %>%
 ```
 
 
-```{r, echo=F}
 
-ggplot(alc, aes(x = high_use, y = failures)) + geom_boxplot() + ggtitle("Distribution of `health` values by group")
-
-```
-
-
+### Family relations
 
 
 ```{r, echo =F}
@@ -134,6 +132,57 @@ ggplot(alc, aes(x = high_use, y = famrel)) + geom_boxplot()
 * This is the sort of finding I expected to see, but the magnitude of difference between the groups is lower than I thought it would be. . 
 
 
+## Logistic regression
+
+### Defining the GLM model, and extracting the coefficients from summary
+
+```{r}
+
+# find the model with glm()
+m <- glm(high_use ~ failures+absences+health+famrel, data = alc, family = "binomial")
+
+# create model summary and extract the coeffs
+summary(m)
+
+coeffs<-m %>% summary() %>% coefficients()
+```
+* All others except family relations are positively correlated with high alcohol use. 
+* Strongest positive correlation  is Failures. Also statistically significant.
+* Also absences correlates positively, shows statistical significance.
+* Family relations correlates negatively, is statistically significant. Pretty much as I would expect
+* Health: no statistical significance seen. 
+* Next step: odds ratios 
+  
+### Converting coeffs to odds ratios, calculating confidence intervals
+  
+  
+```{r, results=T, echo=T, message=F}
+
+OddsRatio<-exp(coeffs)
+ConfInt<- confint(m)
+
+Result<-cbind(OddsRatio, ConfInt)
+
+```
+
+
+
+
+```{r, results=T, echo=T}
+print(Result)
+
+```
+* These estimates are on a different scale than in the more familiar linear regression
+  * There, a coefficient can be interpreted directly. When the value of the independent variable increases by 1 unit, the dependent's value changes by 1 unit as a response . Not the case here.   
+  * These are _odds based_ and need to be thought of in terms of likelihood, not as a direct change in the value of dependent variable's value as independent's value changes.
+  
+* Odds ratios quantify the strength of the relationship between dependent and independent vars. 
+* If OR = 1, the odds of being a heavy drinker or not are the same, regardless of the dependent variable.
+* Here, failures has the strongest link with heavy drinking. An increase of failures by 1 increases the likelihood of being a heavy drinker by almost 2-fold (1.8)
+* For absences and health, the increases in odds are less pronounced. 
+* The relationship with famrel is inverted in comparison to the others: Famrel increase decreases the odd of heavy drinking by 0.25
+
+### Predictice power
 
 
 

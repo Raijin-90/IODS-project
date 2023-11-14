@@ -555,7 +555,7 @@ Hints:
 # alc is available 
 
 # find the model with glm()
-m <- glm(high_use ~ failures + absences + sex, data = alc, family = "binomial")
+m <- glm(as.factor(high_use) ~ failures + absences + sex, data = alc, family = "binomial")
 
 # compute odds ratios (OR)
 OR <- coef(m) %>% exp
