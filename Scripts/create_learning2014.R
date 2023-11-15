@@ -94,7 +94,7 @@ str(lrn14) #166 obs, 7 vars, as required. All variables present
 
 #Set working directory
 
-setwd("E:/R_projektikansio/IODS-project") #Not really needed if you specify the path via "here" syntax. But worth some course points so I'll leave it.
+#setwd("E:/R_projektikansio/IODS-project") #Not really needed if you specify the path via "here" syntax. But worth some course points so I'll leave it.
 
 #Save output as csv
 

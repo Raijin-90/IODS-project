@@ -150,7 +150,7 @@ coeffs<-m %>% summary() %>% coefficients()
 * Strongest positive correlation  is Failures. Also statistically significant.
 * Also absences correlates positively, shows statistical significance.
 * Family relations correlates negatively, is statistically significant. Pretty much as I would expect
-* Health: no statistical significance seen. 
+* Health: no statistical significance seen in this data. Does not necessarily indicate that there is absolutely no link between health status and drinking in existence even if this data doesn't show it, as the body of medical evidence in published literature indicates otherwise. Would a different set of data/different measured metric have given a different outcome? Could the students self-assess their health status as more rosy than it really is, as not all aspects of ill health are immediately obvious to the respondent (e.g. high blood pressure)?   
 * Next step: odds ratios 
   
 ### Converting coeffs to odds ratios, calculating confidence intervals
@@ -180,9 +180,125 @@ print(Result)
 * If OR = 1, the odds of being a heavy drinker or not are the same, regardless of the dependent variable.
 * Here, failures has the strongest link with heavy drinking. An increase of failures by 1 increases the likelihood of being a heavy drinker by almost 2-fold (1.8)
 * For absences and health, the increases in odds are less pronounced. 
-* The relationship with famrel is inverted in comparison to the others: Famrel increase decreases the odd of heavy drinking by 0.25
-
-### Predictice power
+* The relationship with famrel is inverted in comparison to the others: Famrel increase decreases the odd of heavy drinking by 0.25. This was pretty much the expected outcome
 
 
+### Predictive power
+
+## Refining the model: culling variables that showed no statistical significance
+* Health will be dropped, all others remain
+
+```{r, results=T, echo=T}
+m <- glm(high_use ~ failures+absences+famrel, data = alc, family = "binomial")
+
+```
+
+## Predicting the probability of having the status "high use" based on the model, add as new column to alc frame
+
+* here, we take the model from before, and based on it calculate the probability that a certain student (row in data) has the attribute "Strong drinker".    
+
+* Then, we use the probabilities to make a prediction of high_use. 
+* The model takes actual values from the data, and based on them estimates how likely it is that a certain row (student) has the attribute (heavy drinker) These prediction may, or may not, match what the actual value was on each row. 
+
+```{r, results=T, echo=T}
+ 
+alc$predicted_probabilities <- predict(m, type = "response")  #type determines which outcome is given, see ?predict
+
+
+alc <- mutate(alc,prediction  = predicted_probabilities > 0.5) #Selects those, for which the model indicates should have more than 50% prob of being a heavy drinker. T if over 50, F if not. 
+
+
+```
+
+## Comparison of actual values (High use or not) and predicted values. How many mismatches in actual terms, how accurate were we?
+
+
+```{r, results=T, echo=F}
+
+
+x<-alc %>% select(failures, absences, famrel, high_use, predicted_probabilities, prediction) 
+x<-table(high_use = x$high_use, prediction = x$prediction)
+
+y<-x
+y<-(y/370)*100
+
+```
+
+### Direct comparison by counts and percentages
+```{r, results=T}
+print(x)
+print (y)
+```
+
+* Rows that were in reality (as in the value of high_use) FALSE, were predicted to be FALSE by the model (correctly classified) 242  times (65.4 %)   
+* For TRUE-TRUE case, just 19 observations were recorded (5 %). In this kind of tabulation, it has to be remembered that the groups are not nearly equal in size. There's just 111 TRUE cases, and 259 FALSEs. 
+
+### Penalty function definition
+
+```{r, echo=T}
+
+# define a loss function (mean prediction error)
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5 
+  mean(n_wrong)
+}
+
+```
+
+#### Idea of the function, what it does and why
+* Task: Find the proportion of "light drinkers" that the model misclassified as "heavies"
+* Set probability of being heavy drinker at 0%
+* Function takes: 
+  * class" of a student, can be either 1 or 0, heavy drinker or not. 
+  * Then it takes a set probability, and substracts them. 
+* Say, that it finds a student with a class of 0. 
+* Substracts the probability (0) and class value. If class is 0 and prob is 0, result is also 0, lower than 0.5 (FALSE).This is a correct classification, as we just set the probability of being a heavy drinker at 0.
+* If it were a positive number, it'd have found a heavy drinker (1- 0 = 1, which is > 0.5, TRUE), despite the  prob being 0 (=found a misclassed case)
+
+* A converse case: we want to find cases in which class is 0, even though we set the probability of being heavy drinker at 100 %
+* Conversely, if it was set at 1 (100% likelihood of being a heavy drinker), and the function finds a class of 1, the function would look like: abs(1-1) = 0, which is not > 0.5. We would have a correctly classed case.  
+* If it finds a misclassified one, it'd be  (0-1) = -1, which as an absolute number (drop the minus) is higher than 0.5. 
+
+* In each scenario, the function also calculates the mean
+
+* Here, we set the function to find students of class 0, and check if they are mismatched as 1
+
+
+```{r, results=T}
+
+loss_func(class = alc$high_use, prob = 0)
+
+```
+
+
+
+* The average number of mismatches,  of students that were found to be of class 1, despite the probability of of being such set at zero, was 0.3.
+* If there were only mismatches found by the function  (i.e. all 1:s in the n_wrong object), the mean would be 1. The less mismatches, the lower the value --> Better result regarding accuracy. 
+```{r, results=T}
+
+loss_func(class = alc$high_use, prob = 1)
+
+```
+* The opposite case (0's found when probability was 1) was 0.7. 
+
+* Model appears to misclassify 0:s as 1:s almost doubly more often, than the opposite way.  
+
+
+### Cross validation
+
+```{r, results=T}
+
+
+# K-fold cross-validation
+library(boot)
+cv <- cv.glm(data = alc, cost = loss_func, glmfit = m, K = 10)
+
+# average number of wrong predictions in the cross validation
+cv$delta[1]
+
+```
+
+* Compared to the model in the excercise, these predictors we now look at have a bit higher mean prediction error, but not overwhelmingly so. The difference is rather small (circa 0.3 versus 0.26)
+
+_further delving into the bonus section if time allows..._
 
