@@ -1,5 +1,5 @@
 ---
-title: "Assignment4"
+title: "Chapter 4: Clustering and classification"
 author: "Henri V"
 date: "2023-11-18"
 output: html_document
@@ -9,22 +9,102 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+### Installation of the necessary packages
 
-```{r cars}
-summary(cars)
+```{r, message=F, warning=FALSE}
+
+require(tidyverse);require(here);require(MASS);require(corrplot); require(GGally)
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+### Analysis
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+#### Data overview
+
+* First, we load the Boston dataset and check its dimensions & structure.  
+
+```{r}
+data(Boston)
+
+str(Boston)
+dim(Boston)
+```
+  * Overall the dimensions are 506 x 14. 
+  * All of the 14 variables appear numerical (integer or double).
+  * Next, we look up what each of the 14 vars represents. 
+  * The dataset has an official documentation. 
+      * Input command "?Boston" to view. 
+      * In the documentation, variable definitions are provided. 
+  * The data contains information on housing in the Boston region, USA. 
+  * Included variables are:
+      * CRIM - per capita crime rate by town
+      * ZN - proportion of residential land zoned for lots over 25,000 sq.ft.
+      * INDUS - proportion of non-retail business acres per town.
+      * CHAS - Charles River dummy variable (1 if tract bounds river; 0 otherwise)
+      * NOX - nitric oxides concentration (parts per 10 million)
+      * RM - average number of rooms per dwelling
+      * AGE - proportion of owner-occupied units built prior to 1940
+      * DIS - weighted distances to five Boston employment centres
+      * RAD - index of accessibility to radial highways
+      * TAX - full-value property-tax rate per $10,000
+      * PTRATIO - pupil-teacher ratio by town
+      * B - 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
+      * LSTAT - % lower status of the population
+      * MEDV - Median value of owner-occupied homes in $1000's
+      
+* Next, graphical and table format summaries are generated for the data
+
+* First, summary as a table
+```{r, fig.width=20, fig.height=20, results=F}
+summary(Boston)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+* The summary values for each var are wildly different. They are all on different scales, despite being all numeric. This is why standardization over vars will soon be done, to make them comparable.  
+
+```{r, fig.width=20, fig.height=20, results=F}
+ggpairs(Boston)
+```
+
+
+* There's quite a lot of options on what to look at here. I'm going to cherry pick some findings, instead of going through every variable. 
+
+* Multiple variables have skewed distributions. For example:
+  * Age skews strongly towards high values -> mainly old buildings (built before -1940)
+  * Variable dis (distance to employment centers) has a skew towards low values (distance to employment centers commonly small)
+* Also, several variables have bimodality (= more than 1 peak in the distribution, meaning that 2 values are more common than others)
+* Scatterplot Indus x NOx appears to show 2 distinct groupings? For most data points, both NOX concentrations and the share of industrial acreage are low (these have a strong, statistically significant correlation coeff too!)  
+
+* Crime rate appears to have a statistically significant correlation with almost all of these vars. Seems to correlate positively with the proportion of industrial acreage, NOX concentrations, large residential land areas...
+* The distribution of "indus" (business acreage) shows bimodality: we have two peaks, indicating that a couple of values are considerably more common than others. This variable also correlates w. high statistical significance with NOX emissions, which makes sense as the variable represents the prevalence of business acreage like industry. 
+* Distribution of NOX is strongly skewed towards small values.
+
+* Age skews strongly towards high values. Overall, most construction in the regions of the data was done prior to 1940. 
+* Again, we see bimodality in property tax rates. Low and high ends of the spectrum have clear peaks. 
+
+
+#### Dataset standardization      
+
+* As explained above, all these variables are numeric but have wildly different measurement scales. Hence, standardization. 
+* Let's print summaries of both standardized and non-standardized data and compare
+
+```{r}
+
+
+boston_scaled <- scale(Boston)
+summary(boston_scaled)
+
+```
+
+
+```{r}
+summary(Boston)
+```
+* This procedure changed the scales on which all the different vars are measured. Previously, they were all different as they describe very different things. Now, we have "forced" all of them to a similar scale. See for example how the scale of "black" changes: max was almost 400, way more than for any other var. Due to standardization, it became 0.44. All the vars are now in the "same ballpark". 
+
+
+
+
+
