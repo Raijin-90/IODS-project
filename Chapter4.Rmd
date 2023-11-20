@@ -5,7 +5,9 @@ date: "2023-11-18"
 output: html_document
 ---
 
-## Chapter 4: Clustering and classification
+
+# Chapter 4: Clustering & Classification
+
 
 ### Installation of the necessary packages
 
@@ -22,7 +24,7 @@ require(tidyverse);require(here);require(MASS);require(corrplot); require(GGally
 
 * First, we load the Boston dataset and check its dimensions & structure.  
 
-```{r}
+```{r, results=T}
 data(Boston)
 
 str(Boston)
