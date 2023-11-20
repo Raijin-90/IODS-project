@@ -368,6 +368,7 @@ lda.arrows(lda.fit, myscale = 1)
 
 ## 4.7 Predict LDA
 
+
 Like in the regression, the function `predict()` can be used to predict values based on a model. The function arguments are almost the same. You can see the help page of prediction function for LDA with `?predict.lda`.
 
 We split our data earlier so that we have the test set and the correct class labels. See how the LDA model performs when predicting on new (test) data.
@@ -494,14 +495,16 @@ Hints:
 # Boston dataset is available
 
 # k-means clustering
-km <- kmeans(Boston, centers = "3")
+km <- kmeans(Boston, centers = "2")
+
 
 # plot the Boston dataset with clusters
+pairs(Boston[1:5], col = km$cluster)
+
 pairs(Boston[6:10], col = km$cluster)
-
-
-
 ```
+
+
 
 
 ## 4.10 K-means: determine the k
