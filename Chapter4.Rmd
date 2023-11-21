@@ -24,9 +24,9 @@ require(tidyverse);require(here);require(MASS);require(corrplot); require(GGally
 ```
 
 
-### Analysis
+## Analysis
 
-#### Data overview
+### Data overview
 
 * First, we load the Boston dataset and check its dimensions & structure.  
 
@@ -109,7 +109,7 @@ summary(Boston)
 * This procedure changed the scales on which all the different vars are measured. Previously, they were all different as they describe very different things. Now, we have "forced" all of them to a similar scale. See for example how the scale of "black" changes: max was almost 400, way more than for any other var. Due to standardization, it became 0.44. All the vars are now on the same scale. 
 
 
-#### Categorigal crime variable creation 
+## Categorigal crime variable creation 
 
 * Division to bins according to quantiles, set it as a new variable to the old frame
 
@@ -141,7 +141,7 @@ test <- boston_scaled[-ind,] #everything except the indices in the training set
 
 ```
 
-#### LDA analysis
+## LDA
 
 
 * Fitting LDA on the training data, then plotting it. 
@@ -178,7 +178,7 @@ lda.arrows(lda.fit, myscale =2)
 * Most of the other vars cluster very close together. None of them have vector magnitudes even close to those seen for zn, rad and nox.
 
 
-#### Testing model prediction power
+## Testing model prediction power
 
 * First, we save the "real" class values of the test set, and remove it from the frame.
 * We will use these to compare how well the same model we used on the training data classifies the actual test data- 
@@ -206,7 +206,7 @@ table(correct = correct_classes, predicted = lda.pred$class)
 -> high crime rates appear to be predicted very accurately, while in all other categories the performance is very lackluster.
 
 
-#### K-means clustering
+## K-Means
 
 *Clearing .env, reload Boston raw data and scale it
 
@@ -267,7 +267,8 @@ qplot(x = 1:k_max, y = twcss, geom = 'line')
 
 
 ```
-### Re-running analysis with K set to 2
+
+## Re-running analysis with K set to 2
 
 
 ```{r}
@@ -308,7 +309,8 @@ pairs(Boston_scaled[c(7,14)], col = km$cluster)
 ```{r}
 pairs(Boston_scaled[c(1,14)], col = km$cluster)
 ```
-#### Bonus task
+
+## Bonus task
 
 
 * Load original data, standardize, and run K means with 3 clusters 
@@ -361,9 +363,9 @@ lda.arrows(lda.fit, myscale =20)
 * In the more zoomed plot, LSTAT  looks to be important for group 3, while zn is important for 2. 
 
 
-#### Super bonus
+## Super Bonus
 
-*Install plotly
+* Install plotly
 
 ```{r}
 library(plotly)
