@@ -396,3 +396,6 @@ plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, 
 ```
 
 
+## Data wrangling for next week
+
+* This has been completed; create_human.R" is available in the repo under [Scripts](https://github.com/Raijin-90/IODS-project/tree/master/Scripts) and its output under Data.  
