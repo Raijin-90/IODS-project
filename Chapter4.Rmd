@@ -9,6 +9,12 @@ output: html_document
 # Chapter 4: Clustering & Classification
 
 
+### Data wrangling
+
+Not included, as this time it is listed as the final assignment and deals with next week's data.
+This has been completed; create_human.R" is available in the repo under [Scripts](https://github.com/Raijin-90/IODS-project/tree/master/Scripts). 
+
+
 ### Installation of the necessary packages
 
 ```{r, message=F, warning=FALSE}
@@ -206,7 +212,6 @@ table(correct = correct_classes, predicted = lda.pred$class)
 
 ```{r}
 
-rm(list=ls())
 
 data(Boston)
 
@@ -354,5 +359,40 @@ lda.arrows(lda.fit, myscale =20)
 
 * Now, location on the riverside looks to be the main determinant for group 1. For 3, it appears to be accessibility to radial highways. Remaining variables cluster together in a single mass, with no single ones standing out. 
 * In the more zoomed plot, LSTAT  looks to be important for group 3, while zn is important for 2. 
+
+
+#### Super bonus
+
+*Install plotly
+
+```{r}
+library(plotly)
+```
+
+
+*Calculate matrix products
+
+```{r}
+
+lda.fit <- lda(crime ~ . , data = train)
+
+model_predictors <- dplyr::select(train, -crime)
+
+dim(model_predictors)
+dim(lda.fit$scaling)
+
+matrix_product <- as.matrix(model_predictors) %*% lda.fit$scaling
+matrix_product <- as.data.frame(matrix_product)
+
+```
+
+* 3D Plot
+
+* Colored by the crime classes of the training data, we get the pink "High crime" data points grouped on their own (some overlap with med-high, though) 
+
+```{r, results=T, echo=T}
+plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, type= 'scatter3d', mode='markers', color= train$crime)
+
+```
 
 
