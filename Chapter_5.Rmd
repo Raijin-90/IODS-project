@@ -83,14 +83,46 @@ human<-human %>% select(all_of(keepers))
 
 Task 3: Remove all rows with missing values (1 point).
 
+* Any country (row) with ANYTHING NA will be dropped. 
+
 ```{r}
 
-# Create a vector of vars to keep. Remember that you renamed your vars differently, copypasting the above names into a vector won't work: 
-
-
-
-
+human<-filter(human, complete.cases(human)==T)
 
 ```
+
+Task 4: Remove the observations which relate to regions instead of countries. (1 point)
+
+* Seven final rows are regions instead of countries, dropping them 
+
+```{r}
+human<-human %>% slice(1:(nrow(human)-7))
+
+```
+
+```{r}
+dim(human)
+```
+
+Task 5 The data should now have 155 observations and 9 variables (including the "Country" variable). Save the human data in your data folder. You can overwrite your old ‘human’ data. (1 point).
+
+
+```{r}
+dim(human)
+```
+
+* Dimensions 155 x 9 as requested. 
+* Saving to Data
+
+
+```{r, warning=F}
+
+library(here)
+
+write.csv(human, file=here("Data/human.csv"))
+
+```
+
+
 
 
