@@ -1,0 +1,96 @@
+---
+title: 'Chapter 5: Dimensionality Reduction'
+author: "Henri V"
+date: "2023-12-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data wrangling continues
+
+
+```{r}
+library(tidyverse)
+```
+
+Task 1: Explore the structure and the dimensions of the 'human' data and describe the dataset briefly, assuming the reader has no previous knowledge of it (this is now close to the reality, since you have named the variables yourself). (1 point)
+
+
+* Load the previously-created Human.csv dataset
+* This has been created by merging Human Development Index and Gender Inequality Index data. 
+
+```{r, message=F}
+library(readr)
+human <- read_csv("Data/human.csv")
+human<-select(human, 2:length(human))
+```
+
+
+* Metadata for the human dataset can be found at: https://hdr.undp.org/data-center/documentation-and-downloads. See tables 1 and 5.  
+* The data contains country specific information on Human Development Index values, and associated variables describing the countries. 
+* In the Human Development data, the following variables are included. New, one-word names for these are provided in parentheses and quotes.
+  * HDI ranking in relation to the others
+  * Country name
+  * Human Development Index value (new name: "HDI")  		
+  * Life expectancy at birth ("LifeExp")		
+  * Expected years of schooling ("EduExp")		
+  * Mean years of schooling ("EduMean")		
+  * Gross national income (GNI) per capita ("GNI")		
+  * GNI per capita rank minus HDI rank ("GNI_minus_HDIrank")
+* Variables from the Gender Inequality Index data are:
+  * Country's ranking in terms of the Gender Inequality Index ("GII_Rank")
+  * Country's Gender Inequality Index ranking ("GII") 
+  * Maternal Mortality Ratio by country ("MMRatio")
+  * Adolescent birth rate, i.e. births per 1,000 women ages 15–19 ("ABRate")
+  * Places in parliament held by women ("PRP")
+  * Population with at least some secondary education, %, for women and men respectively ("PSECED_F" and "PSECED_M") 
+  * Labor force participation rate, %, for women and men respecively ("LFPR_F" and "LFPR_M")
+* Calculated variables are:
+  * Ratio of female and male populations with secondary education in each country ("PSECED_FM_Ratio")
+  * Ratio of labor force participation of females and males in each country ("LaborFM_ratio")
+  
+  
+* Check dimensions and structure:   
+```{r, message=F, results=T} 
+str(human)
+dim(human)    
+```
+
+Task 2: Exclude unneeded variables: keep only the columns matching the following variable names (described in the meta file above):  "Country", "Edu2.FM", "Labo.FM", "Edu.Exp", "Life.Exp", "GNI", "Mat.Mor", "Ado.Birth", "Parli.F" (1 point).
+
+
+```{r}
+
+# Create a vector of vars to keep. Remember that you renamed your vars differently, copypasting the above names into a vector won't work: 
+  
+keepers<-c("Country",
+  "PSECED_FM_Ratio",
+  "LaborFM_ratio",
+  "EduExp",
+  "LifeExp",
+  "GNI",
+  "MMRatio",
+  "ABRate",
+  "PRP")
+
+# Select only these vars from human dataframe
+
+human<-human %>% select(all_of(keepers))
+```
+
+Task 3: Remove all rows with missing values (1 point).
+
+```{r}
+
+# Create a vector of vars to keep. Remember that you renamed your vars differently, copypasting the above names into a vector won't work: 
+
+
+
+
+
+```
+
+
