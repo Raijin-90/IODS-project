@@ -11,6 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Data wrangling continues
 
+```{r}
+source(here("Scripts/create_human.R"))
+```
+
 
 ```{r}
 library(tidyverse)
@@ -119,10 +123,10 @@ dim(human)
 
 library(here)
 
-write.csv(human, file=here("Data/human.csv"))
+write.csv(human, file=here("Data/human2.csv"))
 
 ```
 
 
-
+## Analysis phase
 

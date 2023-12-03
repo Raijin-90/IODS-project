@@ -359,6 +359,16 @@ display: none;
 
 <div id="data-wrangling-continues" class="section level2">
 <h2>Data wrangling continues</h2>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.4.2     ✔ purrr   1.0.1
+## ✔ tibble  3.1.8     ✔ dplyr   1.1.0
+## ✔ tidyr   1.3.0     ✔ stringr 1.5.0
+## ✔ readr   2.1.4     ✔ forcats 1.0.0</code></pre>
+<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.2.3</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <p>Task 1: Explore the structure and the dimensions of the ‘human’ data
 and describe the dataset briefly, assuming the reader has no previous
 knowledge of it (this is now close to the reality, since you have named
@@ -369,7 +379,8 @@ the variables yourself). (1 point)</p>
 Inequality Index data.</li>
 </ul>
 <pre class="r"><code>library(readr)
-human &lt;- read_csv(&quot;Data/human.csv&quot;)</code></pre>
+human &lt;- read_csv(&quot;Data/human.csv&quot;)
+human&lt;-select(human, 2:length(human))</code></pre>
 <ul>
 <li>Metadata for the human dataset can be found at: <a href="https://hdr.undp.org/data-center/documentation-and-downloads" class="uri">https://hdr.undp.org/data-center/documentation-and-downloads</a>.
 See tables 1 and 5.<br />
@@ -417,53 +428,66 @@ country (“LaborFM_ratio”)</li>
 <li>Check dimensions and structure:</li>
 </ul>
 <pre class="r"><code>str(human)</code></pre>
-<pre><code>## spc_tbl_ [195 × 20] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
-##  $ ...1             : num [1:195] 1 2 3 4 5 6 7 8 9 10 ...
-##  $ HDI_Rank         : num [1:195] 1 2 3 4 5 6 6 8 9 9 ...
-##  $ Country          : chr [1:195] &quot;Norway&quot; &quot;Australia&quot; &quot;Switzerland&quot; &quot;Denmark&quot; ...
-##  $ HDI              : num [1:195] 0.944 0.935 0.93 0.923 0.922 0.916 0.916 0.915 0.913 0.913 ...
-##  $ LifeExp          : num [1:195] 81.6 82.4 83 80.2 81.6 80.9 80.9 79.1 82 81.8 ...
-##  $ EduExp           : num [1:195] 17.5 20.2 15.8 18.7 17.9 16.5 18.6 16.5 15.9 19.2 ...
-##  $ EduMean          : num [1:195] 12.6 13 12.8 12.7 11.9 13.1 12.2 12.9 13 12.5 ...
-##  $ GNI              : num [1:195] 64992 42261 56431 44025 45435 ...
-##  $ GNI_minus_HDIrank: num [1:195] 5 17 6 11 9 11 16 3 11 23 ...
-##  $ GII_Rank         : num [1:195] 1 2 3 4 5 6 6 8 9 9 ...
-##  $ GII              : num [1:195] 0.067 0.11 0.028 0.048 0.062 0.041 0.113 0.28 0.129 0.157 ...
-##  $ MMRatio          : num [1:195] 4 6 6 5 6 7 9 28 11 8 ...
-##  $ ABRate           : num [1:195] 7.8 12.1 1.9 5.1 6.2 3.8 8.2 31 14.5 25.3 ...
-##  $ PRP              : num [1:195] 39.6 30.5 28.5 38 36.9 36.9 19.9 19.4 28.2 31.4 ...
-##  $ PSECED_F         : num [1:195] 97.4 94.3 95 95.5 87.7 96.3 80.5 95.1 100 95 ...
-##  $ PSECED_M         : num [1:195] 96.7 94.6 96.6 96.6 90.5 97 78.6 94.8 100 95.3 ...
-##  $ LFPR_F           : num [1:195] 61.2 58.8 61.8 58.7 58.5 53.6 53.1 56.3 61.6 62 ...
-##  $ LFPR_M           : num [1:195] 68.7 71.8 74.9 66.4 70.6 66.4 68.1 68.9 71 73.8 ...
-##  $ PSECED_FM_Ratio  : num [1:195] 1.007 0.997 0.983 0.989 0.969 ...
-##  $ LaborFM_ratio    : num [1:195] 0.891 0.819 0.825 0.884 0.829 ...
-##  - attr(*, &quot;spec&quot;)=
-##   .. cols(
-##   ..   ...1 = col_double(),
-##   ..   HDI_Rank = col_double(),
-##   ..   Country = col_character(),
-##   ..   HDI = col_double(),
-##   ..   LifeExp = col_double(),
-##   ..   EduExp = col_double(),
-##   ..   EduMean = col_double(),
-##   ..   GNI = col_double(),
-##   ..   GNI_minus_HDIrank = col_double(),
-##   ..   GII_Rank = col_double(),
-##   ..   GII = col_double(),
-##   ..   MMRatio = col_double(),
-##   ..   ABRate = col_double(),
-##   ..   PRP = col_double(),
-##   ..   PSECED_F = col_double(),
-##   ..   PSECED_M = col_double(),
-##   ..   LFPR_F = col_double(),
-##   ..   LFPR_M = col_double(),
-##   ..   PSECED_FM_Ratio = col_double(),
-##   ..   LaborFM_ratio = col_double()
-##   .. )
-##  - attr(*, &quot;problems&quot;)=&lt;externalptr&gt;</code></pre>
+<pre><code>## tibble [148 × 9] (S3: tbl_df/tbl/data.frame)
+##  $ Country        : chr [1:148] &quot;Norway&quot; &quot;Australia&quot; &quot;Switzerland&quot; &quot;Denmark&quot; ...
+##  $ PSECED_FM_Ratio: num [1:148] 1.007 0.997 0.983 0.989 0.969 ...
+##  $ LaborFM_ratio  : num [1:148] 0.891 0.819 0.825 0.884 0.829 ...
+##  $ EduExp         : num [1:148] 17.5 20.2 15.8 18.7 17.9 16.5 18.6 16.5 15.9 19.2 ...
+##  $ LifeExp        : num [1:148] 81.6 82.4 83 80.2 81.6 80.9 80.9 79.1 82 81.8 ...
+##  $ GNI            : num [1:148] 64992 42261 56431 44025 45435 ...
+##  $ MMRatio        : num [1:148] 4 6 6 5 6 7 9 28 11 8 ...
+##  $ ABRate         : num [1:148] 7.8 12.1 1.9 5.1 6.2 3.8 8.2 31 14.5 25.3 ...
+##  $ PRP            : num [1:148] 39.6 30.5 28.5 38 36.9 36.9 19.9 19.4 28.2 31.4 ...</code></pre>
 <pre class="r"><code>dim(human)    </code></pre>
-<pre><code>## [1] 195  20</code></pre>
+<pre><code>## [1] 148   9</code></pre>
+<p>Task 2: Exclude unneeded variables: keep only the columns matching
+the following variable names (described in the meta file above):
+“Country”, “Edu2.FM”, “Labo.FM”, “Edu.Exp”, “Life.Exp”, “GNI”,
+“Mat.Mor”, “Ado.Birth”, “Parli.F” (1 point).</p>
+<pre class="r"><code># Create a vector of vars to keep. Remember that you renamed your vars differently, copypasting the above names into a vector won&#39;t work: 
+  
+keepers&lt;-c(&quot;Country&quot;,
+  &quot;PSECED_FM_Ratio&quot;,
+  &quot;LaborFM_ratio&quot;,
+  &quot;EduExp&quot;,
+  &quot;LifeExp&quot;,
+  &quot;GNI&quot;,
+  &quot;MMRatio&quot;,
+  &quot;ABRate&quot;,
+  &quot;PRP&quot;)
+
+# Select only these vars from human dataframe
+
+human&lt;-human %&gt;% select(all_of(keepers))</code></pre>
+<p>Task 3: Remove all rows with missing values (1 point).</p>
+<ul>
+<li>Any country (row) with ANYTHING NA will be dropped.</li>
+</ul>
+<pre class="r"><code>human&lt;-filter(human, complete.cases(human)==T)</code></pre>
+<p>Task 4: Remove the observations which relate to regions instead of
+countries. (1 point)</p>
+<ul>
+<li>Seven final rows are regions instead of countries, dropping
+them</li>
+</ul>
+<pre class="r"><code>human&lt;-human %&gt;% slice(1:(nrow(human)-7))</code></pre>
+<pre class="r"><code>dim(human)</code></pre>
+<pre><code>## [1] 141   9</code></pre>
+<p>Task 5 The data should now have 155 observations and 9 variables
+(including the “Country” variable). Save the human data in your data
+folder. You can overwrite your old ‘human’ data. (1 point).</p>
+<pre class="r"><code>dim(human)</code></pre>
+<pre><code>## [1] 141   9</code></pre>
+<ul>
+<li>Dimensions 155 x 9 as requested.</li>
+<li>Saving to Data</li>
+</ul>
+<pre class="r"><code>library(here)</code></pre>
+<pre><code>## here() starts at D:/Opinnot_väitöskirja/IODS 2023/IODS</code></pre>
+<pre class="r"><code>write.csv(human, file=here(&quot;Data/human.csv&quot;))</code></pre>
+</div>
+<div id="analysis-phase" class="section level2">
+<h2>Analysis phase</h2>
 </div>
 
 
