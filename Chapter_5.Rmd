@@ -5,28 +5,24 @@ date: "2023-12-02"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Chapter 5: Dimensionality Reduction
 
 ## Data wrangling continues
 
 ```{r}
-source(here("Scripts/create_human.R"))
+require("here");require("tidyverse")
+#source(here("Scripts/create_human.R"))
+rm(list=c("gii", "hd"))
 ```
 
 
-```{r}
-library(tidyverse)
-```
-
-Task 1: Explore the structure and the dimensions of the 'human' data and describe the dataset briefly, assuming the reader has no previous knowledge of it (this is now close to the reality, since you have named the variables yourself). (1 point)
+**Task 1: Explore the structure and the dimensions of the 'human' data and describe the dataset briefly, assuming the reader has no previous knowledge of it (this is now close to the reality, since you have named the variables yourself). (1 point)**
 
 
 * Load the previously-created Human.csv dataset
 * This has been created by merging Human Development Index and Gender Inequality Index data. 
 
-```{r, message=F}
+```{r}
 library(readr)
 human <- read_csv("Data/human.csv")
 human<-select(human, 2:length(human))
@@ -58,16 +54,14 @@ human<-select(human, 2:length(human))
   
   
 * Check dimensions and structure:   
-```{r, message=F, results=T} 
+```{r} 
 str(human)
 dim(human)    
 ```
 
-Task 2: Exclude unneeded variables: keep only the columns matching the following variable names (described in the meta file above):  "Country", "Edu2.FM", "Labo.FM", "Edu.Exp", "Life.Exp", "GNI", "Mat.Mor", "Ado.Birth", "Parli.F" (1 point).
-
+**Task 2: Exclude unneeded variables: keep only the columns matching the following variable names (described in the meta file above):  "Country", "Edu2.FM", "Labo.FM", "Edu.Exp", "Life.Exp", "GNI", "Mat.Mor", "Ado.Birth", "Parli.F" (1 point).**
 
 ```{r}
-
 # Create a vector of vars to keep. Remember that you renamed your vars differently, copypasting the above names into a vector won't work: 
   
 keepers<-c("Country",
@@ -81,11 +75,11 @@ keepers<-c("Country",
   "PRP")
 
 # Select only these vars from human dataframe
-
 human<-human %>% select(all_of(keepers))
 ```
 
-Task 3: Remove all rows with missing values (1 point).
+
+**Task 3: Remove all rows with missing values (1 point).**
 
 * Any country (row) with ANYTHING NA will be dropped. 
 
@@ -95,7 +89,7 @@ human<-filter(human, complete.cases(human)==T)
 
 ```
 
-Task 4: Remove the observations which relate to regions instead of countries. (1 point)
+**Task 4: Remove the observations which relate to regions instead of countries. (1 point)**
 
 * Seven final rows are regions instead of countries, dropping them 
 
@@ -108,7 +102,7 @@ human<-human %>% slice(1:(nrow(human)-7))
 dim(human)
 ```
 
-Task 5 The data should now have 155 observations and 9 variables (including the "Country" variable). Save the human data in your data folder. You can overwrite your old ‘human’ data. (1 point).
+*Task 5 The data should now have 155 observations and 9 variables (including the "Country" variable). Save the human data in your data folder. You can overwrite your old ‘human’ data. (1 point).*
 
 
 ```{r}
@@ -116,17 +110,196 @@ dim(human)
 ```
 
 * Dimensions 155 x 9 as requested. 
-* Saving to Data
+* Saving to Data, but I will not overwrite, so that the original remains if I need to revert to it. 
 
 
-```{r, warning=F}
-
+```{r}
 library(here)
-
 write.csv(human, file=here("Data/human2.csv"))
-
 ```
 
 
 ## Analysis phase
 
+**Task 1: Move the country names to rownames (see Exercise 5.5). Show a graphical overview of the data and show summaries of the variables in the data. Describe and interpret the outputs, commenting on the distributions of the variables and the relationships between them. (0-3 points)**
+
+* Setting country names as rownames
+
+```{r}
+library(tibble)
+human_<-column_to_rownames(human, "Country")
+```
+
+* Graphical summary
+
+Commentary:
+
+* Basically all variables have a skewed distribution, most often towars small values, 
+  * Except for Female-male ratio in the workforce, and life expectency, both of  which skew towards high values
+* Bear in mind that these are non-standardized values, measured at different scales and having very different ranges as well. 
+* Multiple strong correlations, some of which are highlighted here: 
+  * Rate of adolescent births correlates negatively with Gross national income (very young mothers more common in less affluent nations)
+  * Maternal mortality rates and adolescent births strongly correlate, positive relationship
+  * Life expectency increases with increasing GNI, as expected
+  * Expected years of schooling correlates strongly with GNI & life expectency (positive corr.), and negatively with adolescent births and maternal mortality
+* Looks to me that there might be potential to divide this set of countries into the "Affluent, progressive and educated" and the "less fortunate" subsets, the latter of which is characterized by low GDPs, low education rates, high maternal mortalities and rates of adolescent birth...  
+  
+
+```{r}
+library(GGally)
+ggpairs(human_, progress = F)
+```
+
+* Table-form summary
+
+```{r, results=T}
+summary(human_)
+```
+* As the values are non-standardized, all of them exhibit very different ranges. 
+* Countries clearly have very different conditions. For instance, Life expectancies are at worst merely 49. Similarly broad range is seen for GNI. 
+* If the data is sorted in an ascending order for these vars, a bleak picture is drawn for the "global south". 
+
+```{r, results=T}
+head(arrange(human_, LifeExp, GNI), n= 20)
+```
+
+**Task 2: Perform principal component analysis (PCA) on the raw (non-standardized) human data. Show the variability captured by the principal components. Draw a biplot displaying the observations by the first two principal components (PC1 coordinate in x-axis, PC2 coordinate in y-axis), along with arrows representing the original variables. (0-2 points)**
+
+* PCA on un-standardized data
+
+```{r, results=T}
+
+pca_human_nonstandard <- prcomp(human_)
+summary(pca_human_nonstandard)
+```
+* In this nonstandardized set, PC1 captures practically all of the variance by itself...
+* This is an effect of nonstandardization, as the ranges of all vars are currently massively different... 
+
+```{r, results=T, fig.width=10, fig.height=10}
+biplot(pca_human_nonstandard, choices = 1:2)
+```
+
+Some interpretation. This is asked for in the next task: 
+
+* As the data is not standardized, every variable is measured at a different scale. Only GNI is now highlighted as a contributing variable, as it range is massively higher than that of any other var and thus dominates the analysis.  
+* Basically, the data is now reduced into the "very wealthy countries" and "everybody else". 
+
+* GNI is negatively associated with the 1st PC, vector points towards small PC1 values (see also "loadings" table below, it  shows essentially the same thing).
+  * As GNI increases, PC 1 values get smaller.    
+
+
+```{r, results=T}
+library(loadings)
+
+pca_loading(pca_human_nonstandard)
+
+```
+**Task 3: Standardize the variables in the human data and repeat the above analysis. Interpret the results of both analysis (with and without standardizing). Are the results different? Why or why not? Include captions (brief descriptions) in your plots where you describe the results by using not just your variable names, but the actual phenomena they relate to. (0-4 points)** 
+
+* Standardization, to make the vars comparable. This process, already seen during previous weeks, centers the variables (mean = 0 for all of them), eliminating the "comparing apples and oranges" situation caused by wildly different variation and ranges in each variable.  
+
+```{r, results=T}
+human__scaled<-scale(human_)
+summary(human__scaled)
+```
+
+* Now, let's re-run the analysis and see what changes
+
+```{r, results=T}
+human__scaled<-scale(human_)
+
+pca_human_standard <- prcomp(human__scaled)
+summary(pca_human_standard)
+```
+
+* PC1 is no longer the only dominant component, as it captures just ca. 54 % of the variance.
+* PCs 1 and 2 together are enough to capture most, ca. 70% cumulatively, of the variation. After this, the "benefit" tapers off: the difference between PCs 2 and 3 is just ca. 9 %. 
+
+
+```{r, results=T, fig.width=10, fig.height=10}
+s<-summary(pca_human_standard)
+Pros<-round(100*s$importance[2, ], digits = 2)
+Pros<-paste0(names(Pros), " (", Pros, "%)")
+
+
+biplot(pca_human_standard, choices = 1:2, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab= Pros[1], ylab=Pros[2])
+```
+
+```{r, results=T, fig.width=10, fig.height=10}
+
+pca_loading(pca_human_standard)
+
+
+
+```
+* Interpretation:
+* Way nicer, more nuanced results
+* Maternal mortality and adolescent birth rates are associated with high values of PC1 (positive corr.). 
+  * The vectors for these are very much aligned, with only a small angle between them -> correlate positively with each other.
+* Parliament places held by women, as well as the ratio of women in the workforce, are at a 90 % angle (look at the vectors) in relation to both maternal mortality/adolescent birth pair, and its opposite. This indicates that these variables show no correlation with the others.  They are associated with high values of PC2:    
+* At the same time, PC1 values correlate negatively with GNI, Expected years of education, and life expectency.
+* Seems to describe a cluster of developing economies of the global south, mainly African.
+* Reinforces the idea that maternal mortality rates and adolescent birth rates are often high in countries where GDP, education levels and life expectancy are low.  
+* Polar opposite of this grouping are the "global northeners", industrialized nations characterized by comparatively high GDPs, education rates, and life expectencies.   
+
+
+**Task 5: The tea data comes from the FactoMineR package and it is measured with a questionnaire on tea: 300 individuals were asked how they drink tea (18 questions) and what are their product's perception (12 questions). In addition, some personal details were asked (4 questions).** 
+
+**Explore the data briefly: look at the structure and the dimensions of the data. Use View(tea) to browse its contents, and visualize the data. Use Multiple Correspondence Analysis (MCA) on the tea data (or on just certain columns of the data, it is up to you!). Interpret the results of the MCA and draw at least the variable biplot of the analysis. You can also explore other plotting options for MCA. Comment on the output of the plots. (0-4 points)**
+
+
+
+```{r, results=T}
+library(FactoMineR)
+tea <- read.csv("https://raw.githubusercontent.com/KimmoVehkalahti/Helsinki-Open-Data-Science/master/datasets/tea.csv", stringsAsFactors = TRUE)
+view(tea)
+str(tea)
+dim(tea)
+```
+
+* Checking dimensions and structure
+
+```{r, results=T}
+str(tea)
+dim(tea)
+```
+
+* Plenty of factor variables (class vars) describing tea usage. 
+* Dims 300 x 36
+* Let's simplify a bit and select a subset of these
+
+* Visual summary
+
+```{r}
+# column names to keep in the dataset
+keep_columns <- c("Tea", "How", "how", "sugar", "where", "lunch")
+
+# select the 'keep_columns' to create a new dataset
+tea_time <- select(tea,  keep_columns)
+
+# visual summary
+library(ggplot2)
+pivot_longer(tea_time, cols = everything()) %>% 
+  ggplot(aes(value)) + facet_wrap("name", scales = "free")+geom_bar()+theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+```
+
+Multiple Correspondence Analysis
+
+```{r}
+# multiple correspondence analysis
+library(FactoMineR)
+mca <- MCA(tea_time, graph = F)
+
+summary(mca)
+```
+
+
+* Plotting
+
+```{r}
+plot(mca, invisible=c("ind"), graph.type = "classic")
+
+```
+
+* tea shop & unpackaged have the highest effect on dimension 1
+* variables "other", "chain store+tea shop" and "tea bag+unpackaged" have highest effect on dimension 2
