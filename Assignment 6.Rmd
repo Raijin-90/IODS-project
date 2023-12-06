@@ -7,12 +7,90 @@ output: html_document
 
 #### Task 1: Implement the analyses of Chapter 8 of MABS, using the R codes of Exercise Set 6: Meet and Repeat: PART I but using the RATS data (from Chapter 9 and Meet and Repeat: PART II). (0-7 points: 0-4 points for graphs or analysis results + 0-3 points for their interpretations)
 
-* Analysis workflow will foollow the Excercise set part 1.
+* Analysis workflow will follow the Exercise set part 1.
 * Difference is it will be done on the rat data, not the BPRS data.
 
 1. Load the Rats_lng data which was created in the wrangling script
+  * Re-factorize the class vars
+```{r}
+
+library(here)
+library(tidyverse)
+RATS<-read.csv(here("Data/rats_lng.csv"))
+RATS$X<-NULL
+RATS$ID<-as.factor(RATS$ID)
+RATS$Group<-as.factor(RATS$Group)
+```
+
+2. Initial graphical summary of the unstandardized data. Individual rat's growths...
+
+```{r}
+library(ggplot2)
+ggplot(RATS, aes(x = Time, y = Weight , linetype = ID)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ Group, labeller = label_both) +
+  theme(legend.position = "none") + 
+  scale_y_continuous(limits = c(min(RATS$Weight), max(RATS$Weight)))
+```
+
+* Rat group 1 has the lowest overall weights, and individuals group close together
+* Rat group 2 has a potential outlier individual, starting weight 550 at t = 0. 
+
+3. Standardization and re-plotting
+
+```{r}
+RATS <- RATS %>%
+  group_by(Group) %>%
+  mutate(stdweight = (Weight-mean(Weight))/sd(Weight)) %>%
+  ungroup()
+
+```
 
 ```{r}
 
+library(ggplot2)
+ggplot(RATS, aes(x = Time, y = stdweight, linetype = ID)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ Group, labeller = label_both) +
+  scale_y_continuous(name = "standardized weight")
 
 ```
+
+* Standardization enables better observation of individual differences in growth curves.
+* In 1st rat group, there's another, previously hidden outlier whose standardized weight is lowest of all the others in the group and remains consistently low, never coming close to the weights of the others in the group (tracking phenomenon in reverse, weight starts low and remains low...). A similar "scrawny rat" can be seen in group 3, but that one takes on weight later on and catches up with his group. 
+
+
+3. Aggregate summaries
+
+* Next, mean weight + SD is calculated to better show how the treatment groups as a whole behave, instead of individual rats. 
+
+```{r}
+library(plotrix)
+# Summary data with mean and standard error of weight by group and time 
+RATS <- RATS %>%
+  group_by(Group, Time) %>%
+  summarise( mean = mean(Weight), se = std.error(Weight)) %>%
+  ungroup()
+```
+```{r}
+# Plot the mean profiles
+library(ggplot2)
+ggplot(RATS, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
+  geom_line() +
+  scale_linetype_manual(values = c(1,2,3)) +
+  geom_point(size=3) +
+  scale_shape_manual(values = c(1,2,3)) +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se, linetype="1"), width=0.3) +
+  theme(legend.position = c(0.95,0.45)) +
+  scale_y_continuous(name = "mean(Weight) +/- se(Weight)")
+
+
+```
+
+* Group 1 is decidedly in it's own league, with very different behaviour compared to 2 and 3
+* SE:s of g1 and g3 mostly overlap and their overall profile is very similar. No sig. diff. between the 2?
+
+
+
