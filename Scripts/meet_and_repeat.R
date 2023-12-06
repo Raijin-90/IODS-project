@@ -37,6 +37,15 @@ BPRS_long<-pivot_longer(BPRS, cols=-c(treatment, subject), names_to = "weeks", v
 RATS_long<-pivot_longer(RATS, cols=-c(ID, Group), names_to = "WD", values_to = "Weight")
 
 
+#Add var "Time" to RATS and "Week" to BPRS
+
+RATS_long<-RATS_long %>% mutate(Time = as.integer(substr(WD, 3,4))) 
+
+BPRS_long<-BPRS_long %>% mutate(Week = as.integer(substr(weeks,5,5)))
+
+
+
+
 #Datas used to have dims of e.g.  40x11 for BPRS, i.e. very wide. Many variables. Few rows. 
 #We just squeezed the week information from separate columns to rows, lengthening the whole thing into 360 obs and just 4 vars.
 #This whole operation does not eliminate any information, just compresses the structure. Easily seen via e.g. the view command
