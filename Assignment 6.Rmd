@@ -1,0 +1,7 @@
+---
+title: "Assignment 6: Analysis of longitudinal data"
+author: "Henri V"
+date: "2023-12-06"
+output: html_document
+---
+
