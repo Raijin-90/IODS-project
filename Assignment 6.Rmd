@@ -5,3 +5,14 @@ date: "2023-12-06"
 output: html_document
 ---
 
+#### Task 1: Implement the analyses of Chapter 8 of MABS, using the R codes of Exercise Set 6: Meet and Repeat: PART I but using the RATS data (from Chapter 9 and Meet and Repeat: PART II). (0-7 points: 0-4 points for graphs or analysis results + 0-3 points for their interpretations)
+
+* Analysis workflow will foollow the Excercise set part 1.
+* Difference is it will be done on the rat data, not the BPRS data.
+
+1. Load the Rats_lng data which was created in the wrangling script
+
+```{r}
+
+
+```

@@ -69,8 +69,8 @@ summary(RATS);summary(RATS_long)
 
 
 #Save the longform data
-write.csv(RATS,file=here("Data/rats_lng.csv"))
-write.csv(BPRS, file=here("Data/BPRS_lng.csv"))
+write.csv(RATS_long,file=here("Data/rats_lng.csv"))
+write.csv(BPRS_long, file=here("Data/BPRS_lng.csv"))
 
 
 
