@@ -358,6 +358,8 @@ data</h1>
 </div>
 
 
+<div id="assignment-6-analysis-of-longitudinal-data" class="section level1">
+<h1>Assignment 6: Analysis of longitudinal data</h1>
 <div id="task-1-implement-the-analyses-of-chapter-8-of-mabs-using-the-r-codes-of-exercise-set-6-meet-and-repeat-part-i-but-using-the-rats-data-from-chapter-9-and-meet-and-repeat-part-ii.-0-7-points-0-4-points-for-graphs-or-analysis-results-0-3-points-for-their-interpretations" class="section level4">
 <h4>Task 1: Implement the analyses of Chapter 8 of MABS, using the R
 codes of Exercise Set 6: Meet and Repeat: PART I but using the RATS data
@@ -376,21 +378,22 @@ script</li>
 <ul>
 <li>Re-factorize the class vars</li>
 </ul>
+<pre class="r"><code>library(plotrix)</code></pre>
+<pre><code>## Warning: package &#39;plotrix&#39; was built under R version 4.2.3</code></pre>
 <pre class="r"><code>library(here)</code></pre>
-<pre><code>## Warning: package &#39;here&#39; was built under R version 4.3.2</code></pre>
-<pre><code>## here() starts at E:/R_projektikansio/IODS-project</code></pre>
+<pre><code>## Warning: package &#39;here&#39; was built under R version 4.2.3</code></pre>
+<pre><code>## here() starts at D:/Opinnot_väitöskirja/IODS 2023/IODS</code></pre>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## Warning: package &#39;readr&#39; was built under R version 4.3.2</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.3     ✔ readr     2.1.4
-## ✔ forcats   1.0.0     ✔ stringr   1.5.0
-## ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
-## ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-## ✔ purrr     1.0.2</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2
+## ──</code></pre>
+<pre><code>## ✔ ggplot2 3.4.2     ✔ purrr   1.0.1
+## ✔ tibble  3.1.8     ✔ dplyr   1.1.0
+## ✔ tidyr   1.3.0     ✔ stringr 1.5.0
+## ✔ readr   2.1.4     ✔ forcats 1.0.0</code></pre>
+<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.2.3</code></pre>
 <pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>RATS&lt;-read.csv(here(&quot;Data/rats_lng.csv&quot;))
 RATS$X&lt;-NULL
 RATS$ID&lt;-as.factor(RATS$ID)
@@ -438,15 +441,14 @@ low…). A similar “scrawny rat” can be seen in group 3, but that one
 takes on weight later on and catches up with his group.</li>
 </ul>
 <ol start="3" style="list-style-type: decimal">
-<li>Aggregate summaries</li>
+<li>Aggregate summary graphs</li>
 </ol>
 <ul>
 <li>Next, mean weight + SD is calculated to better show how the
 treatment groups as a whole behave, instead of individual rats.</li>
 </ul>
-<pre class="r"><code>library(plotrix)</code></pre>
-<pre><code>## Warning: package &#39;plotrix&#39; was built under R version 4.3.2</code></pre>
-<pre class="r"><code># Summary data with mean and standard error of weight by group and time 
+<pre class="r"><code>library(plotrix)
+# Summary data with mean and standard error of weight by group and time 
 RATS &lt;- RATS %&gt;%
   group_by(Group, Time) %&gt;%
   summarise( mean = mean(Weight), se = std.error(Weight)) %&gt;%
@@ -470,6 +472,291 @@ behaviour compared to 2 and 3</li>
 <li>SE:s of g1 and g3 mostly overlap and their overall profile is very
 similar. No sig. diff. between the 2?</li>
 </ul>
+<ol start="4" style="list-style-type: decimal">
+<li>Boxplot summary of rat groups’ mean weights</li>
+</ol>
+<pre class="r"><code>RATS&lt;-read.csv(here(&quot;Data/rats_lng.csv&quot;))
+RATS$X&lt;-NULL
+RATS$ID&lt;-as.factor(RATS$ID)
+RATS$Group&lt;-as.factor(RATS$Group)
+
+Rats_mean &lt;- RATS %&gt;%
+  group_by(Time, Group) %&gt;%
+  summarise( mean=mean(Weight) ) %&gt;%
+  ungroup()</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Time&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre class="r"><code>library(ggplot2)
+ggplot(Rats_mean, aes(x = Group, y = mean)) +
+  geom_boxplot() +
+  stat_summary(fun = &quot;mean&quot;, geom = &quot;point&quot;, shape=23, size=4, fill = &quot;white&quot;) +
+  scale_y_continuous(name = &quot;mean(Weight), time 1-22&quot;)</code></pre>
+<p><img src="data:image/png;base64,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/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTEdEX9WiH9M6DFhMR0Rf1aIf0zoMWExHRF/Voh/TOgxYTE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" width="672" /></p>
+<ul>
+<li>Again G1 plays it’s own games, with clearly lower mean weight and
+less variation than in the other groups.</li>
+<li>G2 shows the most variance in weights within the group, while G3 has
+overall highest mean weight.<br />
+</li>
+<li>No outliers identifiable.</li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li>Statistical testing</li>
+</ol>
+<ul>
+<li>Here, we do not have baseline data (Time = 0). Measurements start at
+t=1.</li>
+<li>As there are now 3 groups of rats, a 2-sample t test will not be a
+feasible tool. It can deal with 2 groups, but no more than that.</li>
+<li>As such we will have go straight to anova.</li>
+</ul>
+<pre class="r"><code># Fit the linear model with the mean as the response 
+fit &lt;- lm(mean ~ Group, data = Rats_mean)
+anova(fit)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: mean
+##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Group      2 437104  218552  1006.3 &lt; 2.2e-16 ***
+## Residuals 30   6516     217                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<ul>
+<li>ANOVA detects a statistically significant (P &lt; 0001) difference
+in weight of rats between treatment groups.</li>
+<li>Let’s see if the same can be said the distinctly different G1 is
+omitted. Do only 2 and 3 differ enough for anova to detect a
+difference?</li>
+</ul>
+<pre class="r"><code>Rats_mean_filtered&lt;-filter(Rats_mean, Group %in% c(2,3))
+# Fit the linear model with the mean as the response 
+fit &lt;- lm(mean ~ Group, data = Rats_mean_filtered)
+anova(fit)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: mean
+##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Group      1 9286.5  9286.5  31.192 1.819e-05 ***
+## Residuals 20 5954.5   297.7                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>*Looks like the difference between G2 and G3 is still large enough
+that a statistically significant difference can be seen.</p>
+</div>
+<div id="task-2-implement-the-analyses-of-chapter-9-of-mabs-using-the-r-codes-of-exercise-set-6-meet-and-repeat-part-ii-but-using-the-bprs-data-from-chapter-8-and-meet-and-repeat-part-i." class="section level3">
+<h3>Task 2: Implement the analyses of Chapter 9 of MABS, using the R
+codes of Exercise Set 6: Meet and Repeat: PART II, but using the BPRS
+data (from Chapter 8 and Meet and Repeat: PART I).</h3>
+<p>(0-8 points: 0-4 points for graphs or analysis results + 0-4 points
+for their interpretations)</p>
+<ol style="list-style-type: decimal">
+<li>Load the long-form BPRS data created in the wrangling script</li>
+</ol>
+<pre class="r"><code>library(readr)
+BPRS_lng &lt;- read_csv(here(&quot;Data/BPRS_lng.csv&quot;))</code></pre>
+<pre><code>## New names:
+## Rows: 360 Columns: 6
+## ── Column specification
+## ──────────────────────────────────────────────────────── Delimiter: &quot;,&quot; chr
+## (1): weeks dbl (5): ...1, treatment, subject, pbrs, Week
+## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## • `` -&gt; `...1`</code></pre>
+<pre class="r"><code>BPRS_lng$...1&lt;-NULL
+
+#Re-factorize the treatment var
+BPRS_lng$treatment&lt;-as.factor(BPRS_lng$treatment)</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Statistical analysis.</li>
+</ol>
+<ul>
+<li>First, we fit the BPRS data with a random intercept model. This
+differs from regular lm-function linear regressions in that each test
+subject in the data can have different regression slope intercept points
+than the rest.</li>
+<li>Moreover, the model does not assume that the observations (here
+taken from the same patients over time) are independent.</li>
+<li>We seek to explain the PBRS score with treatment group and time.
+Subject ID is chosen as the random effect, varying from individual to
+individual. Treatment and time are the fixed effects.</li>
+</ul>
+<pre class="r"><code>library(lme4)</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack</code></pre>
+<pre class="r"><code># Create a random intercept model
+BPRS_RandomInt &lt;- lmer(pbrs ~ Week + treatment + (1 | subject), data = BPRS_lng, REML = FALSE)
+
+# Print the summary of the model
+
+summary(BPRS_RandomInt)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood  [&#39;lmerMod&#39;]
+## Formula: pbrs ~ Week + treatment + (1 | subject)
+##    Data: BPRS_lng
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##   2748.7   2768.1  -1369.4   2738.7      355 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.0481 -0.6749 -0.1361  0.4813  3.4855 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  subject  (Intercept)  47.41    6.885  
+##  Residual             104.21   10.208  
+## Number of obs: 360, groups:  subject, 20
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept)  46.4539     1.9090  24.334
+## Week         -2.2704     0.2084 -10.896
+## treatment2    0.5722     1.0761   0.532
+## 
+## Correlation of Fixed Effects:
+##            (Intr) Week  
+## Week       -0.437       
+## treatment2 -0.282  0.000</code></pre>
+<pre class="r"><code>anova(BPRS_RandomInt)</code></pre>
+<pre><code>## Analysis of Variance Table
+##           npar  Sum Sq Mean Sq  F value
+## Week         1 12371.5 12371.5 118.7136
+## treatment    1    29.5    29.5   0.2828</code></pre>
+<ul>
+<li><p>Random effects (group) shows variance of 104 and standard
+deviation of ca. 7 -&gt; Plenty of between individual variation in
+regression intercepts</p></li>
+<li><p>AIC (Akaike information criteria) facilitates the comparison
+between models: if model A has a lower AIC rating than B, A can be
+considered to fit the data better. Now, AIC is 2748.</p></li>
+<li><p>Concerning Fixed effects,negative correlation can be seen with
+time and bprs rating. Group and pbrs correlates positively.</p></li>
+<li><p>Model w. random intercepts and random slopes</p></li>
+</ul>
+<pre class="r"><code>library(lme4)
+
+BPRS_int_coeff&lt;-lmer(pbrs ~ Week + treatment + (Week | subject), data = BPRS_lng, REML = FALSE)
+
+# print a summary of the model
+
+summary(BPRS_int_coeff)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood  [&#39;lmerMod&#39;]
+## Formula: pbrs ~ Week + treatment + (Week | subject)
+##    Data: BPRS_lng
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##   2745.4   2772.6  -1365.7   2731.4      353 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.8919 -0.6194 -0.0691  0.5531  3.7976 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  subject  (Intercept) 64.8222  8.0512        
+##           Week         0.9609  0.9802   -0.51
+##  Residual             97.4305  9.8707        
+## Number of obs: 360, groups:  subject, 20
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept)  46.4539     2.1052  22.066
+## Week         -2.2704     0.2977  -7.626
+## treatment2    0.5722     1.0405   0.550
+## 
+## Correlation of Fixed Effects:
+##            (Intr) Week  
+## Week       -0.582       
+## treatment2 -0.247  0.000</code></pre>
+<pre class="r"><code># perform an ANOVA test on the two models
+anova(BPRS_int_coeff)</code></pre>
+<pre><code>## Analysis of Variance Table
+##           npar Sum Sq Mean Sq F value
+## Week         1 5666.0  5666.0 58.1540
+## treatment    1   29.5    29.5  0.3025</code></pre>
+<ul>
+<li><p>AIC decreases to 2745 -&gt; Better fit than the previous model,
+in which just the intercepts were allowed to vary between
+individuals.</p></li>
+<li><p>Considerable increase in the variance of random effects
+(between-individual variation strong regarding both intercepts and
+slopes).</p></li>
+<li><p>Regarding fixed effects, the coefficient directions appear
+unchanged.</p></li>
+<li><p>Interaction model</p></li>
+</ul>
+<p>*Next, we add an interaction variable: week x treatment.</p>
+<pre class="r"><code>library(lme4)
+
+Interaction&lt;-lmer(pbrs ~ Week + treatment + (Week | subject)+Week*treatment, data = BPRS_lng, REML = FALSE)
+
+# print a summary of the model
+
+summary(Interaction)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood  [&#39;lmerMod&#39;]
+## Formula: pbrs ~ Week + treatment + (Week | subject) + Week * treatment
+##    Data: BPRS_lng
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##   2744.3   2775.4  -1364.1   2728.3      352 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.0513 -0.6271 -0.0768  0.5288  3.9260 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  subject  (Intercept) 65.0048  8.0626        
+##           Week         0.9687  0.9842   -0.51
+##  Residual             96.4702  9.8219        
+## Number of obs: 360, groups:  subject, 20
+## 
+## Fixed effects:
+##                 Estimate Std. Error t value
+## (Intercept)      47.8856     2.2522  21.262
+## Week             -2.6283     0.3589  -7.323
+## treatment2       -2.2911     1.9090  -1.200
+## Week:treatment2   0.7158     0.4010   1.785
+## 
+## Correlation of Fixed Effects:
+##             (Intr) Week   trtmn2
+## Week        -0.650              
+## treatment2  -0.424  0.469       
+## Wek:trtmnt2  0.356 -0.559 -0.840</code></pre>
+<pre class="r"><code># perform an ANOVA test on the two models
+anova(Interaction)</code></pre>
+<pre><code>## Analysis of Variance Table
+##                npar Sum Sq Mean Sq F value
+## Week              1 5610.7  5610.7 58.1598
+## treatment         1   29.5    29.5  0.3055
+## Week:treatment    1  307.5   307.5  3.1870</code></pre>
+<ul>
+<li><p>AIC decreases even further, indicating that the model fits the
+data better with the interaction than without it.</p></li>
+<li><p>Final anova on all 3 candidate models</p></li>
+</ul>
+<pre class="r"><code>anova(Interaction,BPRS_int_coeff,BPRS_RandomInt)</code></pre>
+<pre><code>## Data: BPRS_lng
+## Models:
+## BPRS_RandomInt: pbrs ~ Week + treatment + (1 | subject)
+## BPRS_int_coeff: pbrs ~ Week + treatment + (Week | subject)
+## Interaction: pbrs ~ Week + treatment + (Week | subject) + Week * treatment
+##                npar    AIC    BIC  logLik deviance  Chisq Df Pr(&gt;Chisq)  
+## BPRS_RandomInt    5 2748.7 2768.1 -1369.4   2738.7                       
+## BPRS_int_coeff    7 2745.4 2772.6 -1365.7   2731.4 7.2721  2    0.02636 *
+## Interaction       8 2744.3 2775.4 -1364.1   2728.3 3.1712  1    0.07495 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<ul>
+<li>In the summary, we can see that as we keep developing the model
+further, AIC keeps improving. Ultimately the third and final model (with
+individual variation in both intercept and slope allowed, and
+interaction of time &amp; subject ID) fits the data best.</li>
+</ul>
+</div>
 </div>
 
 

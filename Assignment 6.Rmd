@@ -5,6 +5,9 @@ date: "2023-12-06"
 output: html_document
 ---
 
+
+# Assignment 6: Analysis of longitudinal data 
+
 #### Task 1: Implement the analyses of Chapter 8 of MABS, using the R codes of Exercise Set 6: Meet and Repeat: PART I but using the RATS data (from Chapter 9 and Meet and Repeat: PART II). (0-7 points: 0-4 points for graphs or analysis results + 0-3 points for their interpretations)
 
 * Analysis workflow will follow the Exercise set part 1.
@@ -13,7 +16,7 @@ output: html_document
 1. Load the Rats_lng data which was created in the wrangling script
   * Re-factorize the class vars
 ```{r}
-
+library(plotrix)
 library(here)
 library(tidyverse)
 RATS<-read.csv(here("Data/rats_lng.csv"))
@@ -62,7 +65,7 @@ ggplot(RATS, aes(x = Time, y = stdweight, linetype = ID)) +
 * In 1st rat group, there's another, previously hidden outlier whose standardized weight is lowest of all the others in the group and remains consistently low, never coming close to the weights of the others in the group (tracking phenomenon in reverse, weight starts low and remains low...). A similar "scrawny rat" can be seen in group 3, but that one takes on weight later on and catches up with his group. 
 
 
-3. Aggregate summaries
+3. Aggregate summary graphs
 
 * Next, mean weight + SD is calculated to better show how the treatment groups as a whole behave, instead of individual rats. 
 
@@ -93,4 +96,142 @@ ggplot(RATS, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
 * SE:s of g1 and g3 mostly overlap and their overall profile is very similar. No sig. diff. between the 2?
 
 
+4. Boxplot summary of rat groups' mean weights
 
+```{r}
+
+RATS<-read.csv(here("Data/rats_lng.csv"))
+RATS$X<-NULL
+RATS$ID<-as.factor(RATS$ID)
+RATS$Group<-as.factor(RATS$Group)
+
+Rats_mean <- RATS %>%
+  group_by(Time, Group) %>%
+  summarise( mean=mean(Weight) ) %>%
+  ungroup()
+
+
+
+library(ggplot2)
+ggplot(Rats_mean, aes(x = Group, y = mean)) +
+  geom_boxplot() +
+  stat_summary(fun = "mean", geom = "point", shape=23, size=4, fill = "white") +
+  scale_y_continuous(name = "mean(Weight), time 1-22")
+
+```
+
+* Again G1 plays it's own games, with clearly lower mean weight and less variation than in the other groups. 
+* G2 shows the most variance in weights within the group, while G3 has overall highest mean weight.  
+* No outliers identifiable.
+
+4. Statistical testing
+
+* Here, we do not have baseline data (Time = 0). Measurements start at t=1. 
+* As there are now 3 groups of rats, a 2-sample t test will not be a feasible tool. It can deal with 2 groups, but no more than that. 
+* As such we will have go straight to anova.  
+
+```{r}
+# Fit the linear model with the mean as the response 
+fit <- lm(mean ~ Group, data = Rats_mean)
+anova(fit)
+```
+
+* ANOVA detects a statistically significant (P < 0001) difference in weight of rats between treatment groups. 
+* Let's see if the same can be said the distinctly different G1 is omitted. Do only 2 and 3 differ enough for anova to detect a difference? 
+
+```{r}
+Rats_mean_filtered<-filter(Rats_mean, Group %in% c(2,3))
+# Fit the linear model with the mean as the response 
+fit <- lm(mean ~ Group, data = Rats_mean_filtered)
+anova(fit)
+```
+*Looks like the difference between G2 and G3 is still large enough that a statistically significant difference can be seen. 
+
+
+### Task 2: Implement the analyses of Chapter 9 of MABS, using the R codes of Exercise Set 6: Meet and Repeat: PART II, but using the BPRS data (from Chapter 8 and Meet and Repeat: PART I).
+(0-8 points: 0-4 points for graphs or analysis results + 0-4 points for their interpretations) 
+
+
+1. Load the long-form BPRS data created in the wrangling script
+
+```{r}
+
+library(readr)
+BPRS_lng <- read_csv(here("Data/BPRS_lng.csv"))
+
+BPRS_lng$...1<-NULL
+
+#Re-factorize the treatment var
+BPRS_lng$treatment<-as.factor(BPRS_lng$treatment)
+
+```
+
+2. Statistical analysis.
+
+* First, we fit the BPRS data with a random intercept model. This differs from regular lm-function linear regressions in that each test subject in the data can have different regression slope intercept points than the rest.
+* Moreover, the model does not assume that the observations (here taken from the same patients over time) are independent. 
+* We seek to explain the PBRS score with treatment group and time. Subject ID is chosen as the random effect, varying from individual to individual. Treatment and time are the fixed effects.    
+
+```{r}
+library(lme4)
+
+# Create a random intercept model
+BPRS_RandomInt <- lmer(pbrs ~ Week + treatment + (1 | subject), data = BPRS_lng, REML = FALSE)
+
+# Print the summary of the model
+
+summary(BPRS_RandomInt)
+
+anova(BPRS_RandomInt)
+```
+
+* Random effects (group) shows variance of 104 and standard deviation of ca. 7 -> Plenty of between individual variation in regression intercepts
+* AIC (Akaike information criteria) facilitates the comparison between models: if model A has a lower AIC rating than B, A can be considered to fit the data better. Now, AIC is 2748. 
+* Concerning Fixed effects,negative correlation can be seen with time and bprs rating. Group and pbrs correlates positively.  
+
+* Model w. random intercepts and random slopes
+
+```{r}
+library(lme4)
+
+BPRS_int_coeff<-lmer(pbrs ~ Week + treatment + (Week | subject), data = BPRS_lng, REML = FALSE)
+
+# print a summary of the model
+
+summary(BPRS_int_coeff)
+
+# perform an ANOVA test on the two models
+anova(BPRS_int_coeff)
+```
+* AIC decreases to 2745 -> Better fit than the previous model, in which just the intercepts were allowed to vary between individuals.
+* Considerable increase in the variance of random effects (between-individual variation strong regarding both intercepts and slopes).
+* Regarding fixed effects, the coefficient directions appear unchanged. 
+
+* Interaction model
+
+*Next, we add an interaction variable: week x treatment. 
+
+```{r}
+library(lme4)
+
+Interaction<-lmer(pbrs ~ Week + treatment + (Week | subject)+Week*treatment, data = BPRS_lng, REML = FALSE)
+
+# print a summary of the model
+
+summary(Interaction)
+
+# perform an ANOVA test on the two models
+anova(Interaction)
+```
+* AIC decreases even further, indicating that the model fits the data better with the interaction than without it. 
+
+
+* Final anova on all 3 candidate models
+
+```{r}
+
+anova(Interaction,BPRS_int_coeff,BPRS_RandomInt)
+
+```
+
+* In the summary, we can see that as we keep developing the model further, AIC keeps improving. Ultimately the third and final model (with individual variation in both intercept and slope allowed, and interaction of time & subject ID) fits the data best. 

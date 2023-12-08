@@ -10,7 +10,7 @@ output: html_document
 ## Data wrangling continues
 
 ```{r}
-require("here");require("tidyverse")
+require("here");require("tidyverse");require("FactoMineR")
 #source(here("Scripts/create_human.R"))
 rm(list=c("gii", "hd"))
 ```
